@@ -21,12 +21,14 @@ public final class SimpleMachine implements StateContextListener<SimpleStates, S
 
         transitor.setExternalTransition(SimpleStates.START, SimpleStates.HELLO, SimpleEvents.NEXT, printHello());
         transitor.setInternalTransition(SimpleStates.HELLO, SimpleEvents.LOOP, printHello());
+        transitor.setInternalPeriodicTransition(SimpleStates.HELLO, SimpleEvents.LOOP_PERIODIC, 1000L, printHello());
         transitor.setExternalTransition(SimpleStates.HELLO, SimpleStates.WORLD, SimpleEvents.NEXT, printWorld());
-        transitor.setInternalTransition(SimpleStates.WORLD, SimpleEvents.LOOP, guardWorld(), printHello());
+        transitor.setInternalTransition(SimpleStates.WORLD, SimpleEvents.LOOP, guardWorld(), printWorld());
         transitor.setExternalTransition(SimpleStates.WORLD, SimpleStates.END, SimpleEvents.NEXT);
 
         this.stateMachine = builder.getStateMachine();
         stateMachine.getContext().addListener(this);
+        stateMachine.start();
     }
 
     public void next() {
@@ -35,6 +37,10 @@ public final class SimpleMachine implements StateContextListener<SimpleStates, S
 
     public void loop() {
         stateMachine.sendEvent(SimpleEvents.LOOP);
+    }
+
+    public void loopPeriodic() {
+        stateMachine.sendEvent(SimpleEvents.LOOP_PERIODIC);
     }
 
     public Action<SimpleStates, SimpleEvents> printHello() {
@@ -53,6 +59,7 @@ public final class SimpleMachine implements StateContextListener<SimpleStates, S
                 context.setVariable("WORLD", 1);
             else
                 context.setVariable("WORLD", ((Integer) context.getVariable("WORLD")) + 1);
+            System.out.println("WORLD");
         };
     }
 
@@ -81,6 +88,12 @@ public final class SimpleMachine implements StateContextListener<SimpleStates, S
 
         machine.next();
         machine.loop();
+        machine.loopPeriodic();
+        try{
+            Thread.sleep(5000L);
+        } catch(Exception e){
+            e.printStackTrace();
+        }
         machine.loop();
         machine.next();
         machine.loop();

@@ -1,5 +1,5 @@
 package com.mcana.statemachine.test;
 
 public enum SimpleEvents{
-    NEXT, LOOP
+    NEXT, LOOP, LOOP_PERIODIC
 }

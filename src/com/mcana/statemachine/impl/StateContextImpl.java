@@ -50,6 +50,7 @@ public class StateContextImpl<S extends Enum<S>, E extends Enum<E>> implements S
     public void endTransition(){
         if(activeTransitionContext != null){
             this.currentState = activeTransitionContext.getNextState();
+            this.activeTransitionContext = null;
         }
     }
 
